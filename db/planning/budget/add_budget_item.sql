@@ -1,0 +1,2 @@
+insert into planning_item(tid, category_id, budget_title, todo_title, quantity, rate, total, contact, contact_phone, contact_email, item_notes, budget, todo)
+values (${tid}, ${category}, ${budgetTitle}, ${todoTitle}, ${quantity}, ${rate}, ${total}, ${contact}, ${contactPhone}, ${contactEmail}, ${itemNotes}, ${budget}, ${todo});

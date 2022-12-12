@@ -1,0 +1,1 @@
+select tid, ref_id, court_num from court where tournament_id = ${tid}

@@ -1,0 +1,1 @@
+select * from volunteer_auth where tid = ${tid} and ref_id = ${ref_id};

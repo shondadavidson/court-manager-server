@@ -1,0 +1,14 @@
+select second_cred, sum(second_amount), count(id), second_amount
+from court_assignments a 
+where tid = ${tid}
+and second_amount is not null and second_ref is not null
+group by second_amount, second_cred
+order by
+CASE second_cred
+      WHEN 'Certified' THEN 1
+      WHEN 'Level 2' THEN 2
+      WHEN 'Level 1' THEN 3
+      WHEN 'Not Rated' THEN 4
+      ELSE 5
+END, 
+second_amount desc;

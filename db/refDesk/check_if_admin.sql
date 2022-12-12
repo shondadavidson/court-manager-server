@@ -1,0 +1,1 @@
+select exists(select 1 from tournament_auth where ref_id = ${ref_id}) as admin;

@@ -1,0 +1,944 @@
+create table user_auth (
+    id serial primary key,
+    password text,
+    name varchar,
+    email varchar,
+    ref_id integer,
+    reset_password_token varchar,
+    reset_password_expires varchar,
+    profile_updated boolean default true
+);
+
+create table tournament_auth (
+    tid integer,
+    ref_id integer,
+    admin_type varchar(20) default 'basic',
+    referee boolean default false,
+    line_judge boolean default false,
+    volunteer boolean default false,
+    payout boolean default false
+);
+
+CREATE TABLE "session" (
+ "sid" varchar NOT NULL COLLATE "default",
+    "sess" json NOT NULL,
+    "expire" timestamp(6) NOT NULL
+)
+WITH (OIDS=FALSE);
+ALTER TABLE "session" ADD CONSTRAINT "session_pkey" PRIMARY KEY ("sid") NOT DEFERRABLE INITIALLY IMMEDIATE;
+
+create table courts (
+    tournament_id integer,
+    tournament_name varchar(255),
+    court_num   varchar(10),
+    court_order integer,
+    court_name varchar(10),
+    status varchar(20) default 'open',
+    last_scorecard  text,
+    ref_id      integer,
+    start_time timestamp,
+    current_match integer,
+    line_group   integer,
+    monitor_id integer ,
+    medal varChar(10),
+    second_ref integer,
+    cid serial primary key,
+    description varchar,
+    color varchar,
+    match_starter integer,
+    match_starter_id integer,
+    match_starter_name varchar
+    );
+    
+create table match (
+    match_id    SERIAl PRIMARY KEY,
+    tournament_id integer,
+    court_num   integer,
+    status      varChar(20),
+    scoreCard   text,
+    scorecard_thumbnail text,
+    start_time  TIMESTAMP,
+    end_time    timestamp,
+    score_input_time    timestamp,
+    clipboard_received_time     timestamp
+);
+
+create table score(
+    sid serial primary key,
+    tid smallint,
+    court_num varchar(4),
+    t1p1 smallint,
+    t1p2 smallint,
+    t2p1 smallint,
+    t2p2 smallint,
+    match_type varchar(100),
+    gold boolean default false,
+    t1_winner boolean,
+    t1_g1_score varchar(4),
+    t2_g1_score varchar(4),
+    t1_g2_score varchar(4),
+    t2_g2_score varchar(4),
+    t1_g3_score varchar(4),
+    t2_g3_score varchar(4),
+    t1_g4_score varchar(4),
+    t2_g4_score varchar(4),
+    img_url text,
+    submitted timestamp,
+    recorded timestamp,
+    signature varchar,
+    sysid varchar,
+    match_id varchar
+);
+
+create table player (
+    id  serial primary key,
+    name    varchar(255),
+    rating  varChar(6),
+    birth_year         smallInt,
+    location    varchar(100),
+    club        varChar(100),
+    phone       varChar(10),
+    usapa_id    varchar(10)
+    
+);
+
+create table player_list(
+    pid serial primary key,
+    tid integer,
+    name varchar,
+    phone varchar
+);
+
+create table referee (
+    ref_id      serial primary key,
+    first       varchar,
+    last        varchar,
+    phone       varchar(10),
+    alt_phone   varchar(10),
+    email       varchar,
+    credentials     varchar default 'Not Rated',
+    credentials_verified    varchar default 'Not Rated',
+    address varchar,
+    city varchar,
+    state varchar,
+    zip varchar,
+    referee boolean default false,
+    line_judge boolean default false,
+    volunteer boolean default false,
+    paypal varchar,
+    venmo varchar,
+    zelle varchar,
+    shirt varchar,
+    shirt2 varchar,
+    emergency_name varchar,
+    emergency_number varchar,
+    usap_ambassador boolean default false,
+    newsletter boolean default false 
+);
+
+create table referee_backup (
+    ref_id      integer,
+    first       varchar,
+    last        varchar,
+    phone       varchar(10),
+    alt_phone   varchar(10),
+    email       varchar,
+    credentials     varchar,
+    credentials_verified    varchar ,
+    creation_time timestamp default now(),
+    new_ref_id integer
+);
+
+create table referee_auth_backup (
+    ref_id      serial primary key,
+    first       varchar,
+    last        varchar,
+    phone       varchar(10),
+    alt_phone   varchar(10),
+    email       varchar,
+    credentials     varchar default 'Not Rated');
+
+create table tournament (
+    tid    serial primary key,
+    url     varchar,
+    name    varchar,
+    location    varchar,
+    num_of_courts   smallInt,
+    active boolean default true,
+    zone varchar default 6,
+    start timestamp,
+    end_date timestamp,
+    about text,
+    description text,
+    procedures text default '',
+    text boolean default false,  
+    send_email boolean default true,  //false on tech 
+    test boolean default false,      //true on tech   
+    queue integer default 1,
+    status varchar(20) default 'draft',
+    referee_approval_required boolean default false,
+    referee_coordinator_email varchar(100),
+     certified_amount integer default 0,
+     level_two_amount integer default 0,
+     level_one_amount integer default 0,
+     volunteer_amount integer default 0,
+     ppa boolean default false,
+     app boolean default false,
+     usapa boolean default false,
+      organization varchar(10) default '',
+      line_cord_text varchar(10) default '',
+     line_description text,
+     volunteer_description text,
+     referee_coordinator_number varchar(12),
+     referee_coordinator_name varchar,
+    line_coordinator_name varchar,
+    line_coordinator_email varchar(100),
+    volunteer_coordinator_name varchar,
+    volunteer_coordinator_email varchar,
+    score_reporting boolean default false,
+    medical_number varchar(12),
+    medical_name varchar,
+    time_zone varchar(30),
+referee_post_pay boolean default false,
+referee boolean default false,
+line boolean default false,
+volunteer boolean default false,
+payout_email varchar,
+zero_payout_warning boolean default false,
+head_referee varchar,
+head_referee_phone varchar(12),
+qr_guide boolean default false,
+long integer,
+lat integer ,
+volunteer_signature_required boolean default false,
+volunteer_waiver text,
+country varchar default 'usa',
+ private_tournament boolean default false,
+ facility_map varchar,
+ parent_tournament integer ,
+ pickleball_canada boolean default false ,
+ facility varchar,
+ **delay timestamp,
+**delay_message text,
+invoiced boolean default false
+     
+);
+
+create table ref_signup (
+    rsid  serial primary key,
+    ref_id      integer,
+    tid         integer,
+    admin       boolean default false,
+    dress_code  boolean default false,
+    center_court    boolean default false,
+    barcode     varchar,
+    status boolean default false,
+    on_court boolean default false,
+    court_num  varchar,
+    end_time    timestamp,
+    start_time  timestamp,
+    quick_break  boolean default false,
+    last_match  boolean default false,
+    checkout_note varChar default '',
+    schedule text,
+    shift_checkin  timestamp,
+    note varchar,
+    side_queue      boolean default false,
+    line_court varchar(6),
+    signup_time timestamp default now(),
+    tag varchar  
+);
+
+create table line_signup (
+    ref_id      integer,
+    tid         integer,
+    status boolean default false,
+    on_court boolean default false,
+    court_num  varchar,
+    end_time    timestamp,
+    start_time  timestamp,
+    shift_checkin  timestamp,
+    gid integer,
+    rsid serial primary key
+);
+
+create table court_assignments (
+    id  serial primary key,
+    tid     integer,
+    court_num   varchar(10),
+    ref_id      integer,
+    start_time      timestamp,
+    end_time        timestamp,
+    on_court    boolean default true,
+    medal       varchar(10),
+    match_type  varchar,
+    clipboard boolean default false,
+    match_time varchar,
+    gold boolean default false,
+    sysid varchar default '',
+    forfeit boolean default false,
+     paid boolean default false,
+     amount integer,
+     invoice integer,
+     second_ref boolean,
+     type varchar(20),
+     second_amount integer,
+    second_cred varchar,
+    ref_cred varchar,
+    second_paid boolean,
+    posted boolean,
+    payment_note varchar,
+     posted_second boolean,
+     past_tid integer
+);
+
+create table line_assignments (
+    id  serial primary key,
+    tid     integer,
+    gid     integer,
+    match_id  integer,
+    court_num   varchar(10),
+    ref_id      integer,
+    start_time      timestamp,
+    end_time        timestamp,
+    on_court    boolean default true,
+    medal       varchar(10),
+    match_type  varchar,
+    match_time varchar,
+    gold boolean default false,
+    sysid varchar default '',
+    forfeit boolean default false
+);
+
+
+
+
+create table shift(
+    sid serial primary key,
+    tid  integer,
+    name  varchar,
+    description text,
+    date    date,
+    start_time  timestamptz,
+    end_time    timestamptz,
+    spots  integer,
+    certified  integer,
+    level_two  integer,
+    level_one integer,
+    none        integer,
+    wait_spots  integer,
+    wait_certified  integer,
+    wait_level_two  integer,
+    wait_level_one integer,
+    wait_none        integer,
+   category        varChar(20) default 'other',
+   color varchar(7),
+   pre_reg boolean default false,
+   vcid integer,
+   court_monitor boolean default false 
+
+);
+
+create table shift_spots (
+    shift_id    serial primary key,
+    tid         integer,
+    sid         integer,
+    ref_id      integer,
+    checkin     boolean default false,
+    signup_time     timestamp,
+    referee  boolean default true,
+    waitlist        boolean default false,
+    line_judge      boolean default false,
+    gid  integer,
+    checkin_time timestamp,
+    other boolean default false,
+    captain boolean default false
+);
+
+create table shift_spots_backup (
+    shift_id  integer,
+    tid         integer,
+    sid         integer,
+    ref_id      integer,
+    signup_time     timestamp,
+    removal_time    timestamp default now(),
+    referee  boolean default true,
+    waitlist        boolean default false,
+    line_judge      boolean default false,
+    note            varchar
+);
+
+ create table line_groups (
+    gid  serial primary key,
+    tid  integer,
+    sid  integer,
+    group_name   varchar,
+    court_num    varChar(10),
+    start timestamp,
+    finished timestamp,
+    color varchar
+);
+
+create table volunteer_groups (
+    vgid  serial primary key,
+    tid  integer,
+    sid  integer,
+    group_name   varchar,
+    color varchar
+);
+
+create table recap (
+    id serial primary key,
+    tid integer,
+    ref_id integer,
+    status  text,
+    reason varchar,
+    date_time timestamp
+);
+
+create table volunteer_signup (
+    ref_id      integer,
+    tid         integer,
+    status boolean default false,
+    end_time    timestamp,
+    start_time  timestamp,
+    shift_checkin  timestamp,
+    gid integer,
+    captain boolean default false  /added,
+    shirt_pickup boolean default false ,
+    rsid serial primary key,
+    signed boolean default false,
+    signature varchar,
+    signature_date timestamp
+);
+
+create table email_templates (
+    etid  serial primary key,
+    ref_id   integer,
+    name varchar,
+    subject     varchar default '',
+    body    text,
+    type     varchar(10)
+);
+
+create table volunteer_auth (
+    id serial primary key,
+    ref_id  integer,
+    tid     integer,
+    referee_approved,
+    referee_request,
+    referee_request_note varchar,
+    request_time timestamp,
+    approved_time timestamp,
+    response text
+);
+
+create table invoice (
+invoice_id  serial primary key,
+tid  integer,
+court_assignment_id  integer,
+ref_id  integer,
+payment_date timestamp default now(),
+total  integer,
+signature varchar,
+payeer_id  integer,
+bonus  integer,
+bonus_desc  varchar,
+payment_type  varchar,
+payment_memo varchar
+);
+
+create table category(
+cid serial primary key,
+tid integer,
+category varchar
+);
+
+
+
+create table item(
+iid serial primary key, 
+tid integer,
+cid integer,
+item varchar,
+completed boolean default false,
+due_date timestamp,
+assigned_to integer,
+notes text
+);
+
+create table budget_category (
+sort integer,
+title varchar,
+category_id integer
+);
+
+create table planning_item (
+pid serial primary key,
+category_id integer,
+tid  integer,
+budget_title varchar default '',
+todo_title varchar default '',
+quantity  integer default 0,
+rate numeric default 0.00,
+total numeric default 0.00,
+contact varchar default '', 
+contact_phone varchar default '',
+contact_email varchar default '',
+item_notes text default '',
+completed boolean default false,
+due_date timestamp,
+budget boolean default false,
+todo boolean default false,
+cid integer default 1
+);
+
+create table planning_detail(
+    pdid serial primary key,
+    pid integer,
+    title varchar default '',
+    note text default '',
+    completed boolean default false
+);
+
+create table planning_assignment(
+pa  serial primary key,
+tid integer,
+ref_id integer,
+pid integer);
+
+create table question(
+    qid serial primary key,
+    submitted_by integer,
+    answer_by integer,
+    question text,
+    answer text,
+    url varchar(12),
+    submitted timestamp,
+    answered timestamp
+);
+
+create table notifications (
+nid serial primary key,
+tid integer,
+ref_id integer,
+court_num varchar(4),
+type varchar(10),
+message varchar(258),
+active boolean default true,
+alter table notifications
+time timestamp,
+department varchar
+);
+
+create table volunteer_category (
+vcid serial primary key,
+tid integer,
+name varchar,
+description text,
+show boolean default true,
+court_monitor boolean default false 
+);
+
+create table volunteer_category_admin (
+id serial primary key,
+tid integer,
+vcid integer,
+ref_id integer
+);
+
+create table email (
+eid serial primary key,
+ref_id integer,
+category varchar(20),
+author integer,
+time timestamp,
+tracking varchar,
+subject varchar,
+body text,
+delivered timestamp,
+viewed timestamp,
+data jsonb,
+tid integer
+);
+
+create table payout (
+id serial primary key,
+tid integer,
+ref_id integer,
+w9_required boolean default false,
+w9_received boolean default false,
+total integer,
+paid boolean default false,
+note varchar
+);
+
+create table payment_item (
+pid serial primary key,
+ref_id integer,
+tid integer,
+event varchar,
+place varchar,
+amount integer,
+paid boolean default false,
+payment_type varchar,
+payment_date varchar,
+paid_by varchar 
+);
+
+create table text_log
+(id serial primary key,
+    ref_id integer,
+    tid integer,
+    phone varchar,
+    message text,
+    type varchar,
+    sid varchar,
+    time timestamp default now()
+);
+
+create table message_board (
+    id serial primary key,
+    ref_id integer,
+    tid integer,
+    category varchar,
+    message text,
+    post_time timestamp
+);
+
+create table venue (
+    vid serial primary key,
+    tid integer,
+    name varchar,
+    color varchar,
+    show boolean default true
+);
+
+create table venue_item(
+    id serial primary key,
+    vid integer,
+    list_order integer,
+    title varchar,
+    link varchar,
+    details text,
+    image varchar,
+    color varchar,
+    show boolean default true
+);
+
+create table bingo_items (
+    id serial primary key,
+    tid integer,
+    name varchar,
+    required boolean default false,
+    code varchar
+);
+
+create table bingo_card (
+cid serial primary key,
+tid integer,
+ref_id integer,
+one varchar,
+one_done boolean default false,
+two varchar,
+two_done boolean default false,
+three varchar,
+three_done boolean default false,
+four varchar,
+four_done boolean default false,
+five varchar,
+five_done boolean default false,
+six varchar,
+six_done boolean default false,
+seven varchar,
+seven_done boolean default false,
+eight varchar,
+eight_done boolean default false,
+nine varchar,
+nine_done boolean default false,
+ten varchar,
+ten_done boolean default false,
+eleven varchar,
+eleven_done boolean default false,
+twelve varchar,
+twelve_done boolean default false,
+thirteen varchar,
+thirteen_done boolean default false,
+fourteen varchar,
+fourteen_done boolean default false,
+fifteen varchar,
+fifteen_done boolean default false,
+sixteen varchar,
+sixteen_done boolean default false,
+seventeen varchar,
+seventeen_done boolean default false,
+eighteen varchar,
+eighteen_done boolean default false,
+nineteen varchar,
+nineteen_done boolean default false,
+twenty varchar,
+twenty_done boolean default false,
+twentyone varchar,
+twentyone_done boolean default false,
+twentytwo varchar,
+twentytwo_done boolean default false,
+twentythree varchar,
+twentythree_done boolean default false,
+twentyfour varchar,
+twentyfour_done boolean default false,
+);
+
+create table notification_contact (
+ id serial primary key
+tid integer,
+name varchar,
+phone varchar(12),
+medical boolean default false,
+td boolean default false,
+desk boolean default false,
+second_call boolean default false,
+head_referee boolean default false,
+active boolean default false
+);
+
+create table match_starter (
+id serial primary key, 
+tid integer, 
+ref_id integer, 
+court_num integer,
+start_time timestamp default now(), 
+end_time timestamp,
+minutes integer,
+past_tid integer);
+
+create table tournament_log(
+tid integer,
+editor integer,
+category varchar,
+description text,
+submitted_time timestamp default now()
+);
+
+create table homepage (
+ref_id integer,
+url varchar,
+display_name varchar,
+body text
+);
+
+create table follow (
+    id serial primary key,
+homepage_id integer,
+ref_id integer,
+timestamp timestamp default now()
+);
+
+create table volunteer_time_log (
+id serial primary key,
+tid integer,
+ref_id integer,
+type varchar,
+checkin timestamp,
+checkout timestamp,
+total_time interval
+)
+
+insert into courts (tournament_id, court_num, status)
+values
+(10, 1, 'open'),
+(10, 2, 'open'),
+(10, 3, 'open'),
+(10, 4, 'open'),
+(10, 5, 'open'),
+(10, 6, 'open'),
+(10, 7, 'open'),
+(10, 8, 'open'),
+(10, 9, 'open'),
+(10, 10, 'open'),
+(10, 11, 'open'),
+(10, 12, 'open')
+
+insert into tournament (url, name, location, num_of_courts, active)
+values ('masters','Franklin Pickleball Masters', 'Chicken N Pickle, Witchita, KS', 8, true)
+
+insert into tournament (url, name, location, num_of_courts, active, zone)
+values ('monster','Monster Mast', 'Surprize, AZ', 16, true, 7)
+
+insert into tournament (url, name, location, num_of_courts, active)
+values ('trilogy','Trilogy of Vistancia Pickleball Tournament', 'Peoria, AZ', 12, true)
+
+alter table ref_signup
+add column checkout_note varChar default ''
+
+
+select date
+, (
+select coalesce(json_agg(d), '[]'::json)
+            from (
+                select date,
+                (
+                    select coalesce(json_agg(s), '[]'::json)
+                        from (
+                            select s.shift_id,  r.ref_id, r.first, r.last, r.credentials, r.credentials_verified
+                            from shift_spots s
+                            join referee r on 
+                            r.ref_id = s.ref_id  
+                            where s.sid = t.sid  
+                        ) s
+                    ) as signup
+            ) d
+        ) as date
+from shift t
+where tid = 3
+
+alter table ref_signup
+add column
+schedule text
+
+update shift_spots
+    set ref_id = 320
+    where ref_id = 63;
+
+update court_assignments 
+    set ref_id = 320
+    where ref_id = 63;
+
+update ref_signup
+    set ref_id = 320
+    where ref_id = 63;
+
+delete from referee
+where ref_id = 63
+
+select count(*) as certified_count, sum((end_time - start_time))/ count(*) as avg_certified, sum((end_time - start_time)) as certified_time
+                from court_assignments a
+                 left join referee r on r.ref_id = a.ref_id
+                where tid = 11 and r.credentials = 'Not Rated' and a.medal != 'Gold' and a.medal != 'Bronze' and start_time::date = date '2019-12-15'
+
+
+
+select *
+    , (
+    select coalesce(json_agg(s), '[]'::json)
+                from (
+                    select  count(id), end_time::date
+                    from  court_assignments r 
+                    where r.ref_id = t.ref_id
+                    group by end_time::date
+                ) s
+            ) as count
+            
+ 
+from ref_signup t
+where tid = 3
+
+select t.end_time::date,  count(id)
+from court_assignments t
+where tid = 3
+group by t.end_time::date
+order by end_time
+
+
+//how to reset serial key - do in order
+select * from email_templates order by etid desc  
+select * from email_templates_etid_seq 
+alter sequence recap_id_seq   restart with 847
+
+
+
+update courts set court_order = court_name::integer
+
+update courts set court_order = court_num
+
+ALTER TABLE the_table ALTER COLUMN col_name TYPE integer USING (col_name::integer);
+
+alter table court_assignments
+alter column court_num type varchar(10);
+
+alter table line_assignments
+alter column court_num type varchar(10);
+
+alter table line_groups
+alter column court_num type varchar(10);
+
+
+**Past Match Report
+select court_num, r.first, r.last, 
+((start_time AT TIME ZONE 'UTC') AT TIME ZONE 'EST') as start_time,
+((end_time AT TIME ZONE 'UTC') AT TIME ZONE 'EST') as end_time,
+match_type, match_time, sysid, amount, paid, 
+COALESCE((select certified_amount from tournament where tid = 45 and credentials = 'Certified'), 
+(select level_two_amount from tournament where tid = 45 and credentials = 'Level 2'),
+(select level_one_amount from tournament where tid = 45 and credentials = 'Level 1'),
+(select level_one_amount from tournament where tid = 45 and credentials = 'Level 1'),
+(select volunteer_amount from tournament where tid = 45 and credentials = 'Not Rated'), 0) as estimated_amount,
+ref_cred,  
+(select (first || ' ' ||last) from referee where ref_id = second_ref) as supporting, second_paid, 
+COALESCE((select certified_amount from tournament where tid = 45 and second_cred = 'Certified'), 
+(select level_two_amount from tournament where tid = 45 and second_cred = 'Level 2'),
+(select level_one_amount from tournament where tid = 45 and second_cred = 'Level 1'),
+(select level_one_amount from tournament where tid = 45 and second_cred = 'Level 1'),
+(select volunteer_amount from tournament where tid = 45 and second_cred = 'Not Rated'), 0) as estimated_supporting_amount,
+second_cred
+from court_assignments a 
+left join referee r 
+on a.ref_id = r.ref_id 
+where tid = 45 
+order by id 
+
+
+select count(c.ref_id), first, last, r.ref_id, credentials
+from referee r 
+left join court_assignments c 
+on c.ref_id = r.Ref_id
+where start_time > '2021-01-01' and start_time < '2021-02-01'
+group by r.ref_id
+order by count desc
+
+select count(c.ref_id), first, last, r.ref_id
+from referee r 
+left join court_assignments c 
+on c.ref_id = r.Ref_id
+where start_time > '2021-01-01' and start_time < '2021-02-01'
+group by r.ref_id
+order by count desc
+
+select count(c.ref_id), first, last, r.ref_id, credentials,email, city, state, address
+from referee r 
+left join court_assignments c 
+on c.ref_id = r.Ref_id
+where start_time >= '2022-04-01' and start_time < '2023-05-01'
+and ref_id = 
+group by r.ref_id
+order by count desc
+
+select c.tid, name, start_time at time zone 'US/Mountain', first, last, r.ref_id, email, city, state, credentials 
+from referee r 
+left join court_assignments c 
+on c.ref_id = r.Ref_id
+left join tournament t 
+on t.tid = c.tid
+where start_time >= '2022-01-01' and start_time < '2022-02-01'
+and c.ref_id = 1146
+order by start_time
+
+select first, last, 
+COALESCE((select count(amount) from court_assignments  where ref_id = s.ref_id and tid = 120), 0) as lead_count,
+COALESCE((select sum(amount) from court_assignments  where ref_id = s.ref_id and tid = 120), 0) as lead_total,
+COALESCE((select count(second_amount) from court_assignments  where second_ref = s.ref_id and tid = 120), 0) as supporting_count,
+COALESCE((select sum(second_amount) from court_assignments  where second_ref = s.ref_id and tid = 120), 0) as supporting_total,
+COALESCE((select sum(second_amount) from court_assignments  where second_ref = s.ref_id and tid = 120) + (select sum(amount) from court_assignments  where ref_id = s.ref_id and tid = 120), 0) as total,
+email, paypal, venmo, zelle, address, city, state, zip
+from ref_signup s  
+left join
+referee r 
+on s.ref_id = r.ref_id
+where tid = 120
+order by last, first
+
+select distinct(email) from tournament t 
+left join tournament_auth a 
+on a.tid = t.tid
+left join referee r 
+on r.ref_id = a.ref_id
+where start >= '2022-10-01' and end_date <= '2022-10-31'

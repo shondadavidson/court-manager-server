@@ -1,0 +1,1 @@
+delete from venue_item where id = ${id};

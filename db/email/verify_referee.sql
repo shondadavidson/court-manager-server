@@ -1,0 +1,1 @@
+select ref_id from ref_signup where tid = ${tid} and ref_id = ${ref_id};

@@ -1,0 +1,65 @@
+select name as category, vcid, description,
+
+(select coalesce(json_agg(s), '[]'::json)
+                from (  
+                    select distinct on (c.name, 
+to_char( start_time AT TIME ZONE (select time_zone from tournament where tid = 3), 'HH24:MI') 
+|| ' - ' || 
+to_char( end_time AT TIME ZONE (select time_zone from tournament where tid = 3), 'HH24:MI')
+
+)  
+to_char( start_time AT TIME ZONE (select time_zone from tournament where tid = 3), 'HH24:MI') 
+|| ' - ' || 
+to_char( end_time AT TIME ZONE (select time_zone from tournament where tid = 3), 'HH24:MI') as time,
+start_time, end_time
+
+from shift s 
+where c.vcid = s.vcid
+                ) s
+            ) as shifts
+
+
+from volunteer_category c 
+where tid = 3
+order by name
+
+
+
+
+select to_char((end_time - start_time), ' HH:MI') as hours, first, last, 
+(select name from volunteer_category where vcid = s.vcid) as category,
+s.name,
+COALESCE(
+to_char( start_time AT TIME ZONE (select time_zone from tournament where tid = s.tid), 'Dy MM/DD HH:MI am'), '') as start,
+COALESCE(
+to_char( end_time AT TIME ZONE (select time_zone from tournament where tid = s.tid), 'HH:MI am'), '') as end
+from shift_spots ss 
+left join shift s 
+on s.sid = ss.sid 
+left join referee r 
+on r.ref_id = ss.ref_id
+where ss.tid = 37 and category = 'other'
+order by last, first, start_time
+
+
+// nationals report
+select first, last,
+(
+    select coalesce(json_agg(s), '[]'::json)
+                from (
+                    select  name as tournament, start::date,
+                    (select count(*) from court_assignments where ref_id = x.ref_id and tid = t.tid) as count
+                    from  ref_signup x 
+                    left join tournament t 
+                    on t.tid = x.tid 
+                    where x.ref_id = s.ref_id and t.start > '2021-10-01' and t.usapa = true
+                    
+                ) s
+            ) as tournaments
+from ref_signup s 
+left join referee r 
+on r.ref_id = s.ref_id
+where tid = 336
+order by referee 
+
+

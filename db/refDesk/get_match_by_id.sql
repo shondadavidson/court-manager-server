@@ -1,0 +1,1 @@
+select tid, ref_id, court_num, second_ref from court_assignments where id = ${id};

@@ -1,0 +1,1 @@
+select qr_guide from tournament where tid = ${tid};

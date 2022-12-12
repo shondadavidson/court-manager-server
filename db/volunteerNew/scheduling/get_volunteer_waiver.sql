@@ -1,0 +1,1 @@
+select volunteer_waiver as waiver from tournament where tid = ${tid};

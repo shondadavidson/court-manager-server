@@ -1,0 +1,1 @@
+delete from match_starter where id = ${id};
